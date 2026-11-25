@@ -65,7 +65,7 @@ FastAPI exposes upload, indexing, health, chat and SSE endpoints.
 ## 3. Project structure
 
 ```text
-CyberSage-AI/
+CyberSage-AI-Chatbot/
 ├── app.py                       # Streamlit frontend
 ├── api/
 │   └── main.py                  # FastAPI endpoints
@@ -93,7 +93,7 @@ CyberSage-AI/
 Open Ubuntu (WSL). Change directory to wherever you extracted the project. Example:
 
 ```bash
-cd "/mnt/d/Documents/Projects/CyberSage-AI"
+cd "/mnt/d/Documents/Projects/CyberSage-AI-Chatbot"
 ```
 
 Create and activate a virtual environment:
@@ -151,7 +151,7 @@ The Streamlit frontend calls the FastAPI backend. Run them in **two separate Ubu
 ### Terminal 1 — Backend
 
 ```bash
-cd "/mnt/d/Documents/Projects/CyberSage-AI"
+cd "/mnt/d/Documents/Projects/CyberSage-AI-Chatbot"
 source .venv/bin/activate
 uvicorn api.main:app --reload --host 127.0.0.1 --port 8000
 ```
@@ -162,7 +162,7 @@ Interactive API docs: http://127.0.0.1:8000/docs
 ### Terminal 2 — Frontend
 
 ```bash
-cd "/mnt/d/Documents/Projects/CyberSage-AI"
+cd "/mnt/d/Documents/Projects/CyberSage-AI-Chatbot"
 source .venv/bin/activate
 python -m streamlit run app.py
 ```
