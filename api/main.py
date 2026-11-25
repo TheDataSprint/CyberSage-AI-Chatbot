@@ -57,7 +57,7 @@ def health_check():
 
 @app.get("/documents")
 def list_documents():
-    files = sorted(path.name for path in RAW_DIR.glob("*.pdf"))
+    files = sorted(path.name for path in RAW_DIR.rglob("*.pdf"))
     chunks = 0
     if CHUNKS_FILE.exists():
         with CHUNKS_FILE.open("r", encoding="utf-8") as handle:

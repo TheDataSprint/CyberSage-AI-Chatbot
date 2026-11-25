@@ -1,9 +1,20 @@
 """Streamlit user interface for CyberSage AI. Run the FastAPI backend separately."""
 from __future__ import annotations
+import os
 import requests
 import streamlit as st
+from dotenv import load_dotenv
 
-from cybersage.config import API_BASE_URL
+load_dotenv()
+
+try:
+    API_BASE_URL = st.secrets.get("API_BASE_URL", "")
+except Exception:
+    API_BASE_URL = ""
+
+API_BASE_URL = str(
+    API_BASE_URL or os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
+).rstrip("/")
 
 st.set_page_config(
     page_title="CyberSage AI | Cybersecurity Assistant",
