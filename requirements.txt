@@ -1,0 +1,29 @@
+# Core RAG and orchestration stack (aligned with the reference project)
+langchain>=0.3,<2.0
+langchain-core>=0.3,<2.0
+langchain-community>=0.3,<1.0
+langchain-text-splitters>=0.3,<2.0
+langgraph>=0.2,<2.0
+
+# Embeddings and vector database
+qdrant-client[fastembed]>=1.9,<2.0
+langchain-qdrant>=0.2,<2.0
+fastembed>=0.4,<1.0
+rank-bm25>=0.2,<1.0
+
+# AI API and application layers
+openai>=1.50,<3.0
+python-dotenv>=1.0,<2.0
+streamlit>=1.38,<2.0
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+sse-starlette>=2.1,<4.0
+python-multipart>=0.0.9,<1.0
+pydantic>=2.8,<3.0
+pydantic-settings>=2.4,<3.0
+
+# HTTP and reliability utilities
+httpx>=0.27,<1.0
+requests>=2.32,<3.0
+tenacity>=9.0,<10.0
+pypdf>=5.0,<7.0
