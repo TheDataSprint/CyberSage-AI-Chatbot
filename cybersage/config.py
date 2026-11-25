@@ -17,6 +17,7 @@ RAW_DIR.mkdir(parents=True, exist_ok=True)
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "").strip()
+API_SECRET_TOKEN = os.getenv("API_SECRET_TOKEN", "").strip()
 NVIDIA_BASE_URL = os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1").strip()
 NVIDIA_MODEL = os.getenv(
     "NVIDIA_MODEL", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"

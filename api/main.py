@@ -3,18 +3,35 @@ from __future__ import annotations
 
 import json
 import re
+import secrets
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
-from cybersage.config import RAW_DIR, CHUNKS_FILE, QDRANT_COLLECTION
+from cybersage.config import RAW_DIR, CHUNKS_FILE, QDRANT_COLLECTION, API_SECRET_TOKEN
 from cybersage.ingestion import index_pdf_directory
 from cybersage.vector_store import get_qdrant_client, collection_exists
 from cybersage.workflow import answer_question
+
+def require_api_token(x_api_key: str | None = Header(default=None)):
+    if not API_SECRET_TOKEN:
+        raise HTTPException(
+            status_code=503,
+            detail="Backend API token is not configured."
+        )
+
+    if not x_api_key or not secrets.compare_digest(
+        x_api_key, API_SECRET_TOKEN
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or missing API token."
+        )
+
 
 app = FastAPI(
     title="CyberSage AI API",
@@ -55,7 +72,7 @@ def health_check():
     }
 
 
-@app.get("/documents")
+@app.get("/documents", dependencies=[Depends(require_api_token)])
 def list_documents():
     files = sorted(path.name for path in RAW_DIR.rglob("*.pdf"))
     chunks = 0
@@ -65,7 +82,7 @@ def list_documents():
     return {"pdf_files": files, "indexed_chunks": chunks}
 
 
-@app.post("/documents/upload")
+@app.post("/documents/upload", dependencies=[Depends(require_api_token)])
 async def upload_document(file: UploadFile = File(...)):
     original_name = Path(file.filename or "upload.pdf").name
     if Path(original_name).suffix.lower() != ".pdf":
@@ -81,7 +98,7 @@ async def upload_document(file: UploadFile = File(...)):
     return {"message": "PDF uploaded. Click Index documents to build the knowledge base.", "filename": safe_name}
 
 
-@app.post("/documents/index")
+@app.post("/documents/index", dependencies=[Depends(require_api_token)])
 def index_documents():
     try:
         return index_pdf_directory()
@@ -108,12 +125,12 @@ def _run_chat(request: ChatRequest) -> dict:
         raise HTTPException(status_code=500, detail=f"Chat request failed: {exc}") from exc
 
 
-@app.post("/chat")
+@app.post("/chat", dependencies=[Depends(require_api_token)])
 def chat(request: ChatRequest):
     return _run_chat(request)
 
 
-@app.post("/chat/stream")
+@app.post("/chat/stream", dependencies=[Depends(require_api_token)])
 async def chat_stream(request: ChatRequest):
     """Return the completed answer as an SSE event for clients needing SSE transport."""
     result = _run_chat(request)

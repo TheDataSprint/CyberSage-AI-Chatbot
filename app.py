@@ -9,12 +9,17 @@ load_dotenv()
 
 try:
     API_BASE_URL = st.secrets.get("API_BASE_URL", "")
+    API_SECRET_TOKEN = st.secrets.get("API_SECRET_TOKEN", "")
 except Exception:
-    API_BASE_URL = ""
+    API_BASE_URL = os.getenv("API_BASE_URL", "")
+    API_SECRET_TOKEN = os.getenv("API_SECRET_TOKEN", "")
 
 API_BASE_URL = str(
     API_BASE_URL or os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
 ).rstrip("/")
+API_SECRET_TOKEN = str(
+    API_SECRET_TOKEN or os.getenv("API_SECRET_TOKEN", "")
+).strip()
 
 st.set_page_config(
     page_title="CyberSage AI | Cybersecurity Assistant",
@@ -48,8 +53,24 @@ st.markdown(
 
 
 def api_request(method: str, endpoint: str, **kwargs):
+    headers = dict(kwargs.pop("headers", {}) or {})
+
+    if API_SECRET_TOKEN:
+        headers["X-API-Key"] = API_SECRET_TOKEN
+    elif endpoint != "/health":
+        raise RuntimeError(
+            "API_SECRET_TOKEN is missing. Configure it in your local .env "
+            "or Streamlit Secrets."
+        )
+
     try:
-        response = requests.request(method, f"{API_BASE_URL}{endpoint}", timeout=120, **kwargs)
+        response = requests.request(
+            method,
+            f"{API_BASE_URL}{endpoint}",
+            timeout=120,
+            headers=headers,
+            **kwargs
+        )
         if response.status_code >= 400:
             try:
                 detail = response.json().get("detail", response.text)
